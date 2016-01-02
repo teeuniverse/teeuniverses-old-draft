@@ -8,6 +8,7 @@ enum
 	MODAPI_MODITEMTYPE_IMAGE = 0,
 	MODAPI_MODITEMTYPE_SPRITE,
 	MODAPI_MODITEMTYPE_LINESTYLE,
+	MODAPI_MODITEMTYPE_SKINMODIFIER,
 };
 
 struct CModAPI_ModItem_Image
@@ -70,6 +71,52 @@ struct CModAPI_ModItem_LineStyle
 	//General information
 	int m_AnimationType; //MODAPI_LINESTYLE_ANIMATION_XXXXX
 	int m_AnimationSpeed;
+};
+
+enum
+{
+	MODAPI_SKINMODFLAG_KEEP = 0x0, // do not change this part
+	MODAPI_SKINMODFLAG_CHANGEFILE = 0x1, // use another file
+	MODAPI_SKINMODFLAG_CHANGECOLOR = 0x2, // change color. If not given, keep the one set by the player
+	MODAPI_SKINMODFLAG_EXTERNALFILE = 0x4, // the file to use is supplied with the mod
+};
+
+struct CModAPI_ModItem_SkinModifier
+{
+	// general
+	int m_Id;
+
+	// body
+	int m_BodyFlags;
+	int m_BodyColor;
+	int m_BodyImage;
+
+	// marking
+	int m_MarkingFlags;
+	int m_MarkingColor;
+	int m_MarkingImage;
+
+	// decoration
+	int m_DecoFlags;
+	int m_DecoColor;
+	int m_DecoImage;
+
+	// hands
+	int m_HandsFlags;
+	int m_HandsColor;
+	int m_HandsImage;
+
+	// feet
+	int m_FeetFlags;
+	int m_FeetColor;
+	int m_FeetImage;
+
+	// eyes
+	int m_EyesFlags;
+	int m_EyesColor;
+	int m_EyesImage;
+
+	int m_HookStyle; // a line style ID
 };
 
 #endif
