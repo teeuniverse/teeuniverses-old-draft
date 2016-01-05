@@ -831,28 +831,18 @@ void CServer::ProcessClientPacket(CNetChunk *pPacket)
 			if((pPacket->m_Flags&NET_CHUNKFLAG_VITAL) != 0 && m_aClients[ClientID].m_State == CClient::STATE_AUTH)
 			{
 				const char *pVersion = Unpacker.GetString(CUnpacker::SANITIZE_CC);
-				if(str_comp(pVersion, GameServer()->NetVersion()) != 0)
+				if(str_comp(pVersion, MODAPI_NETVERSION_TW07) == 0)
+					m_aClients[ClientID].m_Protocol = MODAPI_CLIENTPROTOCOL_TW07;
+				else if(str_comp(pVersion, MODAPI_NETVERSION_TW06) == 0)
+					m_aClients[ClientID].m_Protocol = MODAPI_CLIENTPROTOCOL_TW06;
+				else
 				{
-					if(str_comp(pVersion, MODAPI_NETVERSION_TW07) == 0)
-					{
-						m_aClients[ClientID].m_Protocol = MODAPI_CLIENTPROTOCOL_TW07;
-					}
-					/*
-					else if(str_comp(pVersion, MODAPI_NETVERSION_TW06) == 0)
-					{
-						m_aClients[ClientID].m_Protocol = MODAPI_CLIENTPROTOCOL_TW06;
-					}
-					*/
-					else
-					{
-						// wrong version
-						char aReason[256];
-						str_format(aReason, sizeof(aReason), "Wrong version. Server is running '%s' and client '%s'", GameServer()->NetVersion(), pVersion);
-						m_NetServer.Drop(ClientID, aReason);
-						return;
-					}
+					// wrong version
+					char aReason[256];
+					str_format(aReason, sizeof(aReason), "Unsupported version. Client is running '%s', which is neither 0.6, 0.7 nor ModAPI.", pVersion);
+					m_NetServer.Drop(ClientID, aReason);
+					return;
 				}
-				else m_aClients[ClientID].m_Protocol = MODAPI_CLIENTPROTOCOL_TW07MODAPI;
 
 				const char *pPassword = Unpacker.GetString(CUnpacker::SANITIZE_CC);
 				if(g_Config.m_Password[0] != 0 && str_comp(g_Config.m_Password, pPassword) != 0)
@@ -862,17 +852,16 @@ void CServer::ProcessClientPacket(CNetChunk *pPacket)
 					return;
 				}
 
+				const char *pModAPI = Unpacker.GetString(CUnpacker::SANITIZE_CC);
+				if(!Unpacker.Error() && str_comp(pModAPI, GameServer()->NetVersion()) == 0)
+					m_aClients[ClientID].m_Protocol = MODAPI_CLIENTPROTOCOL_TW07MODAPI;
+				
 				m_aClients[ClientID].m_State = CClient::STATE_CONNECTING;
 				
 				if(m_aClients[ClientID].m_Protocol == MODAPI_CLIENTPROTOCOL_TW07MODAPI)
-				{
 					SendInitialData(ClientID);
-				}
 				else
-				{
 					SendMap(ClientID);
-				}
-				
 			}
 		}
 		else if(Msg == NETMSG_REQUEST_MAP_DATA)
