@@ -116,9 +116,6 @@ bool CCharacter::IsGrounded()
 	return false;
 }
 
-
-
-
 void CCharacter::DoWeaponSwitch()
 {
 	if(m_QueuedWeapon == -1)
@@ -182,11 +179,6 @@ void CCharacter::FireWeapon()
 	if(!pWeapon)
 		return;
 
-	bool FullAuto = false;
-	if(m_ActiveWeapon == WEAPON_GRENADE || m_ActiveWeapon == WEAPON_SHOTGUN || m_ActiveWeapon == WEAPON_LASER)
-		FullAuto = true;
-
-
 	// check if we gonna fire
 	bool WillFire = false;
 	if(CountInput(m_LatestPrevInput.m_Fire, m_LatestInput.m_Fire).m_Presses)
@@ -201,15 +193,13 @@ void CCharacter::FireWeapon()
 	vec2 Direction = normalize(vec2(m_LatestInput.m_TargetX, m_LatestInput.m_TargetY));
 
 	if(pWeapon->OnFire(Direction))
-	{
 		m_AttackTick = Server()->Tick();
-	}
 }
 
 void CCharacter::HandleWeapons()
 {
-	//Here, regen time is done before fire. Must be fixed using a TickPostFire() method.
-	for(int i=0; i<MODAPI_NUM_WEAPONS; i++)
+	// regen time is done before fire. TODO: Must be fixed using a TickPostFire() method.
+	for(int i=0; i < MODAPI_NUM_WEAPONS; i++)
 	{
 		if(m_aWeapons[i])
 		{
@@ -235,11 +225,14 @@ void CCharacter::HandleWeapons()
 
 bool CCharacter::HasWeapon(int WID)
 {
-	return m_aWeapons[WID];
+	return m_aWeapons[WID] != 0;
 }
 
 void CCharacter::GiveWeapon(CModAPI_Weapon* pWeapon)
 {
+	if(!pWeapon)
+		return;
+
 	int WID = pWeapon->GetID();
 	
 	if(m_aWeapons[WID])
@@ -253,11 +246,10 @@ void CCharacter::GiveWeapon(CModAPI_Weapon* pWeapon)
 
 bool CCharacter::GiveAmmo(int WID, int Ammo)
 {
-	if(m_aWeapons[WID])
-	{
-		return m_aWeapons[WID]->AddAmmo(Ammo);
-	}
-	return false;
+	if(!m_aWeapons[WID])
+		return false;
+
+	return m_aWeapons[WID]->AddAmmo(Ammo);
 }
 
 void CCharacter::SetEmote(int Emote, int Tick)
