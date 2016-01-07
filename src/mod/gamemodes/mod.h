@@ -7,7 +7,5 @@ class CGameControllerMOD : public IGameController
 {
 public:
 	CGameControllerMOD(class CGameContext *pGameServer);
-	
-	virtual OnEntity(int Index, vec2 Pos);
 };
 #endif
