@@ -138,7 +138,8 @@ public:
 
 	CSnapshotDelta m_SnapshotDelta;
 	CSnapshotBuilder m_SnapshotBuilder;
-	CSnapIDPool m_IDPool;
+	CSnapIDPool m_IDPool07;
+	CSnapIDPool m_IDPool07ModAPI;
 	CNetServer m_NetServer;
 	CEcon m_Econ;
 	CServerBan m_ServerBan;
@@ -243,12 +244,15 @@ public:
 	void RegisterCommands();
 
 
-	virtual int SnapNewID();
-	virtual void SnapFreeID(int ID);
+	virtual int SnapNewID07();
+	virtual void SnapFreeID07(int ID);
+	virtual int SnapNewID07ModAPI();
+	virtual void SnapFreeID07ModAPI(int ID);
 	virtual void *SnapNewItem(int Type, int ID, int Size);
 	void SnapSetStaticsize(int ItemType, int Size);
 	
 	//ModAPI
+	CModAPI_Server* m_pModAPIServer;
 	enum
 	{
 		MOD_CHUNK_SIZE = NET_MAX_PAYLOAD - NET_MAX_CHUNKHEADERSIZE-4,
@@ -264,8 +268,9 @@ public:
 	const char *GetModName() const;
 	void SendInitialData(int ClientID);
 	
-	bool CreateMod(const char* pModName);
 	bool LoadMod(const char* pModName);
+	
+	void SetModAPIServer(class CModAPI_Server* pModAPIServer);
 	
 	virtual bool GetClientProtocolCompatibility(int ClientID, int Protocol) const;
 };
